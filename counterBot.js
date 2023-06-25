@@ -18,9 +18,9 @@ client.on('ready', async () => {
       description: 'Calculate user crates with event sale',
       options: [
         {
-          name: 'username',
-          description: 'The username to check amount of WOOPARTSUN during last sale',
-          type: 3, 
+          name: 'packs',
+          description: 'Amount of purchased WOOPARTSUN during last sale',
+          type: 10, 
           required: true,
         },
         {
@@ -50,42 +50,19 @@ client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
   if (interaction.commandName === 'calculate') {
-    const username = interaction.options.getString('username');
+    const packs = interaction.options.getNumber('packs');
     const crypto = interaction.options.getNumber('crypto');
     const woobucks = interaction.options.getNumber('woobucks');
 
-    const requestBody = {
-      jsonrpc: '2.0',
-      id: 1687545623476,
-      method: 'find',
-      params: {
-        contract: 'nft',
-        table: 'WOOLANDinstances',
-        query: {
-          $or: [
-            { account: username },
-            {
-              account: 'nftmarket',
-              ownedBy: 'c',
-              previousAccount: username,
-            },
-          ],
-        },
-        offset: 0,
-        limit: 1000,
-      },
-    };
-
     try {
-      const response = await axios.post('https://enginerpc.com/contracts', requestBody);
-      const packs = response.data.result.length
+      
       const points = packs*10 + crypto*20 + woobucks*40
       const packsAmount = packs + crypto + woobucks
 
       const exampleEmbed = new EmbedBuilder()
         .setTitle('Crates Information')
-        .setThumbnail('https://media.discordapp.net/attachments/954737938401484831/954739157396250704/1up_cartel_woo.png')
-        .setDescription(`Username: ${username}\nPoints: ${points}`)
+        .setThumbnail(points >= 2000 ? 'https://cdn.discordapp.com/attachments/997572087281635449/1119832791157321749/legendary_crate.png': 'https://cdn.discordapp.com/attachments/997572087281635449/1119832791874555994/common_crate.png')
+        .setDescription(`Your points: ${points}`)
         .addFields(
           { name: 'You will get', value: points >= 2000 ? `Common Crates: ${packsAmount*5}\nLegendary Crates: ${packsAmount}` : `Common Crates: ${packsAmount}`},
         )
